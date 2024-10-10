@@ -2,14 +2,12 @@
 Here we run the simulations of the PROD model. We create the graph, the recommender, and the model. We run the model and save the results.
 """
 #We import the necessary libraries
-import networkx as nx
-import numpy as np
-from modules.PROD import PROD
 from modules.random_graph import LFRBenchmark  
 from modules.measurement import Measurement
+from modules.PROD import PROD
 from tqdm import tqdm
-import sys
 import json
+import sys
 
 def read_intervention(intervention_name:str)->str:
     """

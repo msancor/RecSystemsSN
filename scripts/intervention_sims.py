@@ -3,15 +3,13 @@ Here we run the simulations of the PROD model. We create the graph, the recommen
 Here we add the evaluation of the intervention. We run the simulations for different intervention probabilities.
 """
 #We import the necessary libraries
-import networkx as nx
-import numpy as np
-from modules.PROD import PROD
 from modules.random_graph import LFRBenchmark  
 from modules.measurement import Measurement
+from modules.PROD import PROD
 from tqdm import tqdm
-import sys
 import json
-import os
+import sys
+
 
 def run_PROD_k_times(G_list:list, recommender_name:str, intervention_name:str, intervention_prob:float, recommendations:bool, K:int)->dict:
     """

@@ -1,3 +1,4 @@
+from fastnode2vec import Graph, Node2Vec
 import networkx as nx
 import numpy as np
 import heapq as hq
@@ -31,8 +32,37 @@ class Recommender():
             return self.__oba_recommender(G, node_id, k)
         elif self.name == "random":
             return self.__random_recommender(G, node_id, k)
+        elif self.name == "node2vec":
+            return self.__node2vec_recommender(G, node_id, k)
         else:
-            raise ValueError("Recommender Not Found. Please choose between pagerank, wtf, oba, and random.")
+            raise ValueError("Recommender Not Found. Please choose between pagerank, wtf, oba, node2vec, and random.")
+        
+    def __node2vec_recommender(self, G:nx.DiGraph, node_id:int, k:int):
+        #Here we define the parameters for the Node2Vec model
+        #First we define the embedding dimension
+        self.EMBEDDING_DIM = 10
+        #Then we define the random walk length
+        self.RW_LENGTH = 100
+        #Then we define the window size i.e. the number of nodes to be considered on each side of the target node
+        self.WINDOW_SIZE = 5
+        #Then we define the parameters p and q for the Node2Vec model i.e. the return and in-out parameters
+        self.P = 2.0
+        self.Q = 0.5
+        #Then we define the number of workers to be used in the Node2Vec model
+        self.WORKERS = 2
+        #Here we create the edge list from the graph so we perform an efficient training of the Node2Vec model
+        edge_list = [(u,v) for u,v,_ in G.edges(data=True)]
+        #Here we create the graph object and train the Node2Vec model
+        graph = Graph(edge_list, directed=True, weighted=False)
+        n2v = Node2Vec(graph, dim=self.EMBEDDING_DIM, walk_length=self.RW_LENGTH, window=self.WINDOW_SIZE, p=self.P, q=self.Q, workers=self.WORKERS)
+        n2v.train(epochs=100, verbose=False)
+        #Here we get the neighbors of the node_id so we can remove them from the recommendations
+        neighbor_list = self.__get_neighbors(G, node_id)
+        #Here we get the most similar nodes to the node_id according to the Node2Vec model
+        list_recs = n2v.wv.most_similar(node_id, topn=1000)
+        #Here we get the top-k recommendations
+        top_k = [u for u,_ in list_recs if u not in neighbor_list][:k]
+        return top_k
         
     def __personalized_pagerank_recommender(self, G:nx.DiGraph, node_id:int, k:int, diff_to:int = -1):
         """

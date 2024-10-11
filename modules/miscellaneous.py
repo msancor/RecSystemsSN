@@ -1,13 +1,15 @@
-import json
-import numpy as np
-import networkx as nx
-from scipy.stats import kstest
-from typing import Tuple, List
-import matplotlib.pyplot as plt
-import matplotlib
 from modules.random_graph import LFRBenchmark
 from modules.measurement import Measurement
+import matplotlib.pyplot as plt
+from typing import Tuple, List
 from modules.PROD import PROD
+from scipy.stats import kstest
+import networkx as nx
+import numpy as np
+import matplotlib
+import json
+import tqdm
+
 
 def plot_graph(G:nx.DiGraph, n_maxmin_alpha:Tuple[float], e_maxmin_alpha:Tuple[float], ax: plt.Axes = None) -> None:
     """
@@ -90,9 +92,9 @@ def run_example_simulations(homophily:float, modularity:float, n:int=400) -> Tup
     graphs = [lfr.G]
 
     #We can generate a list of recommenders
-    recommenders = [None, "wtf", "oba", "pagerank"]
+    recommenders = [None, "wtf", "oba", "pagerank", "node2vec"]
     #We can generate the simulations for each recommender
-    for recommender_system in recommenders:
+    for recommender_system in tqdm.tqdm(recommenders):
         n_recommendations = 0
         #We can set the number of recommendations as 40% of the number of edges of the graph
         if recommender_system is not None:

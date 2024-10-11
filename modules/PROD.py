@@ -43,27 +43,32 @@ class PROD():
             nodes = np.random.permutation(self.nodes)
             #For each node, we make the interactions
             for node in nodes:
-                #If the bernoulli trial is successful, we make a recommendation
-                if self.__bernoulli_trial(alpha):
-                    #Here we make a recommendation
-                    recommended_node = self.recommender.top_k_recommendation(self.G, node_id=node)[0]
-                    #Eliminate the edge between the node and a random neighbor to keep attention span
-                    random_neighbor = self.__get_random_neighbor(node)
-                    #Here we eliminate the edge between the node and the random neighbor
-                    self.G.remove_edge(node, random_neighbor)
-                    #Here we add the edge between the node and the recommended node
-                    self.__add_edge(node, recommended_node)
-                    #Here we update the opinions of the nodes
-                    self.__bounded_confidence_model(node, recommended_node)
-                    #Here we update the number of recommendations
-                    r += 1
-                    #If the number of recommendations is equal to the number of maximum recommendations, we set alpha to 0
-                    if r == self.n_recommendations:
-                        alpha = 0
-                #If the bernoulli trial is not successful, we make an interaction
-                else:
-                    random_neighbor = self.__get_random_neighbor(node)
-                    self.__bounded_confidence_model(node, random_neighbor)
+                #Here we initialize the number of interactions
+                s = 0
+                while s < self.int_per_step:
+                    #If the bernoulli trial is successful, we make a recommendation
+                    if self.__bernoulli_trial(alpha):
+                        #Here we make a recommendation
+                        recommended_node = self.recommender.top_k_recommendation(self.G, node_id=node)[0]
+                        #Eliminate the edge between the node and a random neighbor to keep attention span
+                        random_neighbor = self.__get_random_neighbor(node)
+                        #Here we eliminate the edge between the node and the random neighbor
+                        self.G.remove_edge(node, random_neighbor)
+                        #Here we add the edge between the node and the recommended node
+                        self.__add_edge(node, recommended_node)
+                        #Here we update the opinions of the nodes
+                        self.__bounded_confidence_model(node, recommended_node)
+                        #Here we update the number of recommendations and interactions
+                        r += 1
+                        s += 1
+                        #If the number of recommendations is equal to the number of maximum recommendations, we set alpha to 0
+                        if r == self.n_recommendations:
+                            alpha = 0
+                    #If the bernoulli trial is not successful, we make an interaction
+                    else:
+                        random_neighbor = self.__get_random_neighbor(node)
+                        self.__bounded_confidence_model(node, random_neighbor)
+                        s += 1
 
     def __add_edge(self, node:int, recommended_node:int):
         """

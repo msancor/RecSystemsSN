@@ -1,5 +1,6 @@
 from modules.random_graph import LFRBenchmark
 from modules.measurement import Measurement
+from collections import Counter
 import matplotlib.pyplot as plt
 from typing import Tuple, List
 from modules.PROD import PROD
@@ -7,6 +8,7 @@ from scipy.stats import kstest
 import networkx as nx
 import numpy as np
 import matplotlib
+import powerlaw
 import json
 import tqdm
 
@@ -39,6 +41,39 @@ def plot_graph(G:nx.DiGraph, n_maxmin_alpha:Tuple[float], e_maxmin_alpha:Tuple[f
     if ax is not None:
         ax.axis("on")
     return None
+
+def degree_dist(G: nx.Graph) -> Tuple[list, list, list]:
+    """
+    Function to calculate the degree distribution of the graph
+    Parameters:
+        G (nx.Graph): Graph to calculate the degree distribution
+    Returns:
+        Tuple[list]: Tuple with the degrees, x values and y values of the degree distribution
+    """
+    #Here we calculate the degree distribution of the graph
+    degrees = dict(G.degree()).values()
+    degree_distribution = Counter(degrees)
+    #Here we normalize the degree distribution
+    x,y = [],[]
+    n = G.number_of_nodes()
+    for i in sorted(degree_distribution):
+        x.append(i)
+        y.append(degree_distribution[i]/n)
+    #Here we return the degree distribution
+    return list(degrees),x,y
+
+def fit_power_law(degrees:list)->Tuple[powerlaw.Fit, float]:
+    """
+    Function to fit a power law to the degree distribution of the graph
+    Parameters:
+        degrees (list): List with the degrees of the graph
+    Returns:
+        Tuple[powerlaw.Fit, float]: Tuple with the power law fit and the alpha value
+    """
+    #Here we fit a power law to the degree distribution
+    fit = powerlaw.Fit(degrees, xmin=8)
+    alpha = fit.alpha
+    return fit, alpha
 
 def get_results_matrix(measure:str) -> Tuple[np.array]:
     """

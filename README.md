@@ -5,7 +5,7 @@ This is a Github repository created to submit the final project of the **Social 
 We acknowledge the authors as the full responsibles of this project and this reproduction is made only for didactic purposes. If you attempt to reproduce the results presented on this repository, please cite the original article:
 
 ```markdown
-article{Cinus_Minici_Monti_Bonchi_2022,
+@article{Cinus_Minici_Monti_Bonchi_2022,
 title={The Effect of People Recommenders on Echo Chambers and Polarization},
 volume={16},
 url={https://ojs.aaai.org/index.php/ICWSM/article/view/19275},
